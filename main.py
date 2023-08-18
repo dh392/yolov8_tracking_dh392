@@ -4,9 +4,14 @@ import supervision as sv
 import numpy as np
 from array import array
 
+##########################################################################################################################################################
+                              
+                                                    ###############################################
+                                                    ##                SOCKET CONFIG              ##
+                                                    ###############################################
+
 # import socket
 
-# ##########################
 # ### Config socket ###
 # s = socket.socket(socket.AF_INET,
 # socket.SOCK_STREAM)         
@@ -17,45 +22,9 @@ from array import array
 
 # print("CONNECTION FROM:", str(addr)) 
 
-# # ##########################
+##########################################################################################################################################################
 
-# import threading
-# import queue
-# import cv2
-
-# class VideoCapture:
-
-#     def __init__(self, name):
-#         self.cap = cv2.VideoCapture(name)
-#         self.q = queue.Queue()
-#         t = threading.Thread(target=self._reader)
-#         t.daemon = True
-#         t.start()
-
-#     # read frames as soon as they are available, keeping only most recent one
-#     def _reader(self):
-#         while True:
-#             ret, frame = self.cap.read()
-#             if not ret:
-#                 break
-#             if not self.q.empty():
-#                 try:
-#                     self.q.get_nowait()   # discard previous (unprocessed) frame
-#                 except queue.Empty:
-#                     pass
-#             self.q.put(frame)
-
-#     def read(self):
-#         return self.q.get()
-
-#     def release(self):
-#         self.cap.release()
-
-# url = "http://169.254.199.250/mjpg/video.mjpg?timestamp=1692257423856"
-# video_capture = VideoCapture(url)
-# source_dh392 = video_capture.read()
-
-#####################################################################
+##########################################################################################################################################################
 box_annotator = sv.BoxAnnotator(
     thickness=2,
     text_thickness=1,
@@ -96,7 +65,13 @@ def base_control(x_error, y_error):
     data = str(vx) + '#' + str(vz) + '#'
     print(data)
     # c.send(data.encode())
-#####################################################################
+##########################################################################################################################################################
+     
+##########################################################################################################################################################
+                              
+                                                    ###############################################
+                                                    ## RUNNING WITH INTEL REALSENSE D435i CAMERA ##
+                                                    ###############################################
 
 import pyrealsense2 as rs
 import numpy as np
@@ -235,9 +210,13 @@ finally:
     # Stop streaming
     pipeline.stop()
 
-#####################################################################
+##########################################################################################################################################################
 
-
+##########################################################################################################################################################
+                              
+                                                    ###############################################
+                                                    ##        RUNNING WITH NORMAL CAMERA         ##
+                                                    ###############################################
 # def main():
 
 #     box_annotator = sv.BoxAnnotator(
@@ -320,38 +299,5 @@ finally:
 #             # break
 #             exit()
 
-# def base_control(x_error, y_error):
-#     if(x_error<=40 and x_error>=-40):
-#         x_error = 0
-
-#     if (y_error <=0):
-#         y_error = 0
-
-#     kx = 0.008
-#     kz = 0.002
-#     vx = kx*y_error
-#     vz = kz*x_error
-
-#     # max = 0.3
-#     vx_max = 0.5
-#     vz_max = 0.3
-#     if( vx > vx_max):
-#         vx = vx_max
-#     if( vx < -vx_max):
-#         vx = -vx_max
-#     if (vz > vz_max):
-#         vz = vz_max
-#     if (vz < -vz_max):
-#         vz = -vz_max
-
-#     vx = round(vx, 4)
-#     vz = round(vz, 4)
-
-#     data = str(vx) + '#' + str(vz) + '#'
-#     print(data)
-#     # c.send(data.encode())
-
-
 # if __name__== "__main__":
-#     # main()
-#     test()
+#     main()
