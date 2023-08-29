@@ -3,6 +3,7 @@ from ultralytics import YOLO
 import supervision as sv
 import numpy as np
 from array import array
+import time
 
 ##########################################################################################################################################################
                               
@@ -10,17 +11,17 @@ from array import array
                                                     ##                SOCKET CONFIG              ##
                                                     ###############################################
 
-import socket
+# import socket
 
-### Config socket ###
-s = socket.socket(socket.AF_INET,
-socket.SOCK_STREAM)         
-s.bind(('192.168.131.175',9999))   
-# s.bind(('localhost',9999))   
-s.listen(1)                  
-c, addr = s.accept()         
+# ### Config socket ###
+# s = socket.socket(socket.AF_INET,
+# socket.SOCK_STREAM)         
+# s.bind(('192.168.131.175',9999))   
+# # s.bind(('localhost',9999))   
+# s.listen(1)                  
+# c, addr = s.accept()         
 
-print("CONNECTION FROM:", str(addr)) 
+# print("CONNECTION FROM:", str(addr)) 
 
 ##########################################################################################################################################################
 
@@ -36,6 +37,7 @@ model = YOLO("yolov8n.pt")
 model.export(format="onnx", imgsz=[480,640])
 
 def base_control(x_error, y_error):
+    global vx, vz
     if(x_error<=40 and x_error>=-40):
         x_error = 0
 
@@ -69,7 +71,7 @@ def base_control(x_error, y_error):
 
     data = str(vx) + '#' + str(vz) + '#'
     print(data)
-    c.send(data.encode())
+    # c.send(data.encode())
 ##########################################################################################################################################################
      
 ##########################################################################################################################################################
@@ -224,6 +226,34 @@ def base_control(x_error, y_error):
                                                     ###############################################
 def main():
 
+    with open('dh392_t.txt', 'a') as f:
+        f.write("------------------------------------")
+        f.write("\n")
+
+    with open('dh392_x_error.txt', 'a') as fx:
+        fx.write("------------------------------------")
+        fx.write("\n")
+
+    with open('dh392_y_error.txt', 'a') as fy:
+        fy.write("------------------------------------")
+        fy.write("\n")
+
+    with open('dh392_tv.txt', 'a') as fv:
+        fv.write("------------------------------------")
+        fv.write("\n")
+
+    with open('dh392_vx.txt', 'a') as fvx:
+        fvx.write("------------------------------------")
+        fvx.write("\n")
+
+    with open('dh392_vz.txt', 'a') as fvz:
+        fvz.write("------------------------------------")
+        fvz.write("\n")
+
+    global vx, vz
+
+    start_time = time.time()
+
     box_annotator = sv.BoxAnnotator(
         thickness=2,
         text_thickness=1,
@@ -235,8 +265,8 @@ def main():
     model.export(format="onnx", imgsz=[480,640])
 
 
-    for result in model.track(source=2, stream=True, agnostic_nms=True):    #show=True  --- source=2
-    # for result in model.track(source='http://169.254.199.250/mjpg/video.mjpg?timestamp=1692257423856', show=True, stream=True, agnostic_nms=True):    #show=True
+    for result in model.track(source=0, stream=True, agnostic_nms=True):    #show=True  --- source=2
+    # for result in model.track(source='http://169.254.199.250/mjpg/video.mjpg?timestamp=1693295012221', show=True, stream=True, agnostic_nms=True):    #show=True
         frame = result.orig_img
         detections = sv.Detections.from_yolov8(result)
 
@@ -287,9 +317,39 @@ def main():
             print("x_error: " + str(x_error) + " - y_error = " + str(y_error))
 
 
-            # start_time = time.time()
+            end_error_time = time.time()
+
+            t = end_error_time - start_time
+
+            with open('dh392_t.txt', 'a') as f:
+                f.write(str(t))
+                f.write("\n")
+
+            with open('dh392_x_error.txt', 'a') as fx:
+                fx.write(str(x_error))
+                fx.write("\n")
+
+            with open('dh392_y_error.txt', 'a') as fy:
+                fy.write(str(y_error))
+                fy.write("\n")
 
             base_control(x_error, y_error)
+
+            end_vel_time = time.time()
+
+            tv = end_vel_time - start_time
+
+            with open('dh392_tv.txt', 'a') as fv:
+                fv.write(str(tv))
+                fv.write("\n")
+
+            with open('dh392_vx.txt', 'a') as fvx:
+                fvx.write(str(vx))
+                fvx.write("\n")
+
+            with open('dh392_vz.txt', 'a') as fvz:
+                fvz.write(str(vz))
+                fvz.write("\n")
 
 
         frame = box_annotator.annotate(
